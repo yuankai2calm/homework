@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="TRACE" monitorinterval="300" packages="biz.paluch.logging.gelf.log4j2">
+    <properties>
+        <property name="GAME_LOG_HOME">logs/${sys:logFileName}</property>
+        <property name="log_charset">UTF-8</property>
+        <property name="LOG_HOME">log/hotgame</property>
+        <!-- 日志备份目录 -->
+        <property name="BACKUP_HOME">${LOG_HOME}/backup</property>
+        <property name="STAT_NAME">stat</property>
+        <property name="SERVER_NAME">gameData</property>
+    </properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/> -->
+            <!--<PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>-->
+            <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] (%F:%L) [%p][%c][%M] %m%n"/>-->
+            <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] (%l) %msg%n"/>-->
+            <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %L %M - %msg%xEx%n"/>-->
+            <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %M - %msg%n"/>-->
+            <!--<PatternLayout charset="${log_charset}" pattern="%d{HH:mm:ss.SSS} [%t] %-5level [%l] - %msg%xEx%n"/>-->
+            <PatternLayout charset="${log_charset}" pattern="%d{HH:mm:ss.SSS} %-5level [%file:%line] : %msg%n"/>
+            <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>-->
+        </Console>
+
+        <Console name="toConsole" target="SYSTEM_OUT">
+            <PatternLayout>
+                <charset>UTF-8</charset>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} (%F:%L) [%p][%c] %m%n</Pattern>
+            </PatternLayout>
+        </Console>
+
+        <RollingFile name="toFileBackupKafkaLog" fileName="${LOG_HOME}/${STAT_NAME}/${SERVER_NAME}_${STAT_NAME}.log"
+                     filePattern="${LOG_HOME}/${STAT_NAME}/${SERVER_NAME}_${STAT_NAME}.log.%d{yyyy-MM-dd}.log">
+            <StringLayout>
+                <charset>UTF-8</charset>
+            </StringLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingRandomAccessFile name="InfoFile"
+                                 fileName="${GAME_LOG_HOME}/${sys:logFileName}.log"
+                                 filePattern="${GAME_LOG_HOME}/$${date:yyyy-MM-dd}/${sys:logFileName}/${sys:logFileName}-%d{MM-dd-HH}-%i.log">
+                        
+            <Filters>
+                                
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+                                
+                <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+                            
+            </Filters>
+                        
+            <PatternLayout charset="${log_charset}"
+                           pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%file:%line] - %msg%n"/>
+                        
+            <Policies>
+                                
+                <TimeBasedTriggeringPolicy interval="1"/>
+                                
+                <SizeBasedTriggeringPolicy size="500MB"/>
+                            
+            </Policies>
+                        
+            <DefaultRolloverStrategy max="20" fileIndex="max"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="ErrorFile"
+                                 fileName="${GAME_LOG_HOME}/error.log"
+                                 filePattern="${GAME_LOG_HOME}/$${date:yyyy-MM-dd}/error/error-%d{MM-dd-HH}-%i.log">
+                        
+            <Filters>
+                                
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
+                                
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+                            
+            </Filters>
+                        
+            <PatternLayout charset="${log_charset}"
+                           pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%file:%line] - %msg%n"/>
+                        
+            <Policies>
+                                
+                <TimeBasedTriggeringPolicy interval="1"/>
+                                
+                <SizeBasedTriggeringPolicy size="500MB"/>
+                            
+            </Policies>
+                        
+            <DefaultRolloverStrategy max="20" fileIndex="max"/>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+    <Loggers>
+        <!--<Logger name="asynclog" level="trace" includeLocation="true">-->
+        <!--<AppenderRef ref="Async" />-->
+        <!--</Logger>-->
+        <AsyncRoot level="info" includeLocation="true">
+            <AppenderRef ref="Console"/>
+                        
+            <AppenderRef ref="InfoFile"/>
+                        
+            <AppenderRef ref="ErrorFile"/>
+                        
+            <AppenderRef ref="FatalFile"/>
+        </AsyncRoot>
+
+
+
+
+        <!-- 如果有自己的log4j2文件，请把一下内容复制到log4j2中 -->
+        <Logger name="productRemoteKafkaError" level="info" additivity="false">
+            <AppenderRef ref="toConsole"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>

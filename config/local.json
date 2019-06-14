@@ -1,0 +1,9 @@
+{
+  "http.port": 5205,
+  "http.host": "192.168.1.7",
+  "ssl": false,
+  "ssl.path": "",
+  "ssl.password": "",
+  "HandlerPackage": "com.master.homework",
+  "ServicePackage": "com.master.homework"
+}
