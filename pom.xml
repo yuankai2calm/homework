@@ -22,7 +22,7 @@
     <vertx.version>3.7.1</vertx.version>
     <junit-jupiter.version>5.4.0</junit-jupiter.version>
     <main.verticle>com.master.homework.verticle.MainVerticle</main.verticle>
-    <log4jVersion>2.11.0</log4jVersion>
+    <log4jVersion>2.17.1</log4jVersion>
   </properties>
 
   <dependencyManagement>
